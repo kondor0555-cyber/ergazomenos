@@ -78,6 +78,15 @@ function LoginView({ onLogin, onSignup }) {
   const handle = async () => {
     setErr(""); setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    if (data?.user) {
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
+  if (profile?.role === "admin" && pass !== "ERG@2026#ADMIN!xs124kyuspK9mZx$92") {
+    await supabase.auth.signOut();
+    setErr("Λάθος κωδικός διαχειριστή.");
+    setLoading(false);
+    return;
+  }
+}
     if (error) { setErr("Λάθος email ή κωδικός."); setLoading(false); return; }
     // fetch profile
     const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single();
