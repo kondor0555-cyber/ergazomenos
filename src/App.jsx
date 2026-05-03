@@ -9,9 +9,9 @@ const COLORS = {
 
 const JOB_TYPES = { permanent: "Μόνιμη", season: "Εποχική", shortterm: "Ολίγων ημερών", parttime: "Μερική" };
 const JOB_TYPE_COLORS = { permanent: "#1a7a45", season: "#1565c0", shortterm: "#b45309", parttime: "#7b1fa2" };
-const CITIES = ["Όλες","Αθήνα","Θεσσαλονίκη","Πάτρα","Ηράκλειο","Λάρισα","Βόλος","Ζάκυνθος","Ρόδος","Κέρκυρα"];
+const CITIES = ["Όλες","Αθήνα","Θεσσαλονίκη","Πάτρα","Ηράκλειο","Λάρισα","Βόλος","Ζάκυνθος","Ρόδος","Κέρκυρα","Άργος","Ηράκλειο","Κόρινθος"];
 const PROFESSIONS = ["Όλα","Εστίαση","Αποθήκη/Logistics","Λιανικό Εμπόριο","Κατασκευές","Εκπαίδευση","Μεταφορές","Πληροφορική","Τουρισμός","Υγεία"];
-const ADMIN_EMAIL = "kondor0555@gmail.com";
+const ADMIN_EMAIL = "";
 
 // ─── UI Helpers ───────────────────────────────────────────────────
 function Badge({ type }) {
@@ -80,7 +80,7 @@ function LoginView({ onLogin, onSignup }) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
     if (data?.user) {
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
-  if (profile?.role === "admin" && pass !== "ERG@2026#ADMIN!xs124kyuspK9mZx$92") {
+  if (profile?.role === "admin" && pass !== "αα45664566ααΑ@") {
     await supabase.auth.signOut();
     setErr("Λάθος κωδικός διαχειριστή.");
     setLoading(false);
@@ -90,7 +90,7 @@ function LoginView({ onLogin, onSignup }) {
     if (error) { setErr("Λάθος email ή κωδικός."); setLoading(false); return; }
     // fetch profile
     const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single();
-    const role = profile?.role === "admin" ? "admin" : (profile?.role || "worker");
+   const role = profile?.role || "worker";
     onLogin({ ...data.user, ...profile, role });
     setLoading(false);
   };
