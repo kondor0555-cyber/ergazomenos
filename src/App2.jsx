@@ -9,9 +9,9 @@ const COLORS = {
 
 const JOB_TYPES = { permanent: "Μόνιμη", season: "Εποχική", shortterm: "Ολίγων ημερών", parttime: "Μερική" };
 const JOB_TYPE_COLORS = { permanent: "#1a7a45", season: "#1565c0", shortterm: "#b45309", parttime: "#7b1fa2" };
-const CITIES = ["Όλες","Αθήνα","Θεσσαλονίκη","Πάτρα","Ηράκλειο","Λάρισα","Βόλος","Ζάκυνθος","Ρόδος","Κέρκυρα"];
+const CITIES = ["Όλες","Αθήνα","Θεσσαλονίκη","Πάτρα","Ηράκλειο","Λάρισα","Βόλος","Ζάκυνθος","Ρόδος","Κέρκυρα","Άργος","Ηράκλειο","Κόρινθος"];
 const PROFESSIONS = ["Όλα","Εστίαση","Αποθήκη/Logistics","Λιανικό Εμπόριο","Κατασκευές","Εκπαίδευση","Μεταφορές","Πληροφορική","Τουρισμός","Υγεία"];
-const ADMIN_EMAIL = "kondor0555@gmail.com";
+const ADMIN_EMAIL = "";
 
 // ─── UI Helpers ───────────────────────────────────────────────────
 function Badge({ type }) {
@@ -20,11 +20,6 @@ function Badge({ type }) {
 }
 function UrgentBadge() {
   return <span style={{ background:"#fef3cd", color:"#92400e", border:"1px solid #f59e0b60", borderRadius:20, padding:"2px 10px", fontSize:11, fontWeight:700 }}>⚡ ΕΠΕΙΓΟΝ</span>;
-}
-function ActiveBadge({ active }) {
-  return active
-    ? <span style={{ background:"#dcfce7", color:"#166534", border:"1px solid #86efac", borderRadius:20, padding:"2px 10px", fontSize:11, fontWeight:600 }}>✅ Ενεργή</span>
-    : <span style={{ background:"#fef2f2", color:"#991b1b", border:"1px solid #fca5a5", borderRadius:20, padding:"2px 10px", fontSize:11, fontWeight:600 }}>❌ Ανενεργή</span>;
 }
 function Spinner() {
   return <div style={{ display:"flex", alignItems:"center", justifyContent:"center", padding:60 }}><div style={{ width:36, height:36, border:`3px solid ${COLORS.border}`, borderTop:`3px solid ${COLORS.primary}`, borderRadius:"50%", animation:"spin 0.8s linear infinite" }} /><style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style></div>;
@@ -55,7 +50,6 @@ function JobCard({ job, onCall, onDetail }) {
           <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:6 }}>
             <Badge type={job.type} />
             {job.urgent && <UrgentBadge />}
-            <ActiveBadge active={job.active !== false} />
           </div>
           <div style={{ fontWeight:700, fontSize:16, color:COLORS.text, marginBottom:2 }}>{job.title}</div>
           <div style={{ fontSize:13, color:COLORS.muted, marginBottom:6 }}>{job.employer} · {job.city}{job.area ? `, ${job.area}` : ""}</div>
@@ -84,10 +78,19 @@ function LoginView({ onLogin, onSignup }) {
   const handle = async () => {
     setErr(""); setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    if (data?.user) {
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
+  if (profile?.role === "admin" && pass !== "αα45664566ααΑ@") {
+    await supabase.auth.signOut();
+    setErr("Λάθος κωδικός διαχειριστή.");
+    setLoading(false);
+    return;
+  }
+}
     if (error) { setErr("Λάθος email ή κωδικός."); setLoading(false); return; }
     // fetch profile
     const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single();
-    const role = email === ADMIN_EMAIL ? "admin" : (profile?.role || "worker");
+   const role = profile?.role || "worker";
     onLogin({ ...data.user, ...profile, role });
     setLoading(false);
   };
@@ -490,11 +493,6 @@ function AdminView({ user, onLogout }) {
     setJobs(prev => prev.filter(j => j.id !== id));
   };
 
-  const toggleActive = async (id, current) => {
-    await supabase.from("jobs").update({ active: !current }).eq("id", id);
-    setJobs(prev => prev.map(j => j.id === id ? {...j, active: !current} : j));
-  };
-
   const StatCard = ({label, value, icon, color}) => (
     <div style={{ background:COLORS.card, borderRadius:14, padding:"20px 22px", border:`1.5px solid ${COLORS.border}` }}>
       <div style={{ fontSize:28, marginBottom:8 }}>{icon}</div>
@@ -563,7 +561,7 @@ function AdminView({ user, onLogout }) {
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
                   <thead>
                     <tr style={{ background:COLORS.bg }}>
-                      {["Τίτλος","Εταιρεία","Πόλη","Τύπος","Μισθός","Τηλ.","Κατάσταση",""].map(h=>(
+                      {["Τίτλος","Εταιρεία","Πόλη","Τύπος","Μισθός","Τηλ.",""].map(h=>(
                         <th key={h} style={{ padding:"10px 14px", textAlign:"left", color:COLORS.muted, fontWeight:600 }}>{h}</th>
                       ))}
                     </tr>
@@ -577,14 +575,7 @@ function AdminView({ user, onLogout }) {
                         <td style={{ padding:"10px 14px" }}><Badge type={j.type} /></td>
                         <td style={{ padding:"10px 14px", color:COLORS.success, fontWeight:600 }}>{j.salary}</td>
                         <td style={{ padding:"10px 14px" }}>{j.phone}</td>
-                      <td style={{ padding:"10px 14px" }}>
-                          <ActiveBadge active={j.active !== false} />
-                        </td>
-                        <td style={{ padding:"10px 14px", display:"flex", gap:6 }}>
-                          <button onClick={()=>toggleActive(j.id, j.active !== false)}
-                            style={{ background: j.active !== false ? "#fef2f2" : "#dcfce7", color: j.active !== false ? COLORS.danger : "#166534", border:`1px solid ${j.active !== false ? COLORS.danger+"30" : "#86efac"}`, borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
-                            {j.active !== false ? "Απενεργοποίηση" : "Ενεργοποίηση"}
-                          </button>
+                        <td style={{ padding:"10px 14px" }}>
                           <button onClick={()=>deleteJob(j.id)}
                             style={{ background:"#fef2f2", color:COLORS.danger, border:`1px solid ${COLORS.danger}30`, borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
                             Διαγραφή
