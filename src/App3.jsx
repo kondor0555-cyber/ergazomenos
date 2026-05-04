@@ -485,7 +485,8 @@ function AdminView({ user, onLogout }) {
     load();
   }, []);
 
-  const deleteJob = async (id) => {
+  const deleteJob = async (id, title) => {
+    if (!window.confirm(`Θέλεις σίγουρα να διαγράψεις την αγγελία "${title}";`)) return;
     await supabase.from("jobs").delete().eq("id", id);
     setJobs(prev => prev.filter(j => j.id !== id));
   };
@@ -493,19 +494,6 @@ function AdminView({ user, onLogout }) {
   const toggleActive = async (id, current) => {
     await supabase.from("jobs").update({ active: !current }).eq("id", id);
     setJobs(prev => prev.map(j => j.id === id ? {...j, active: !current} : j));
-  };
-
-  const [editJob, setEditJob] = useState(null);
-
-  const saveEditJob = async () => {
-    await supabase.from("jobs").update({
-      title: editJob.title, employer: editJob.employer, city: editJob.city,
-      area: editJob.area, profession: editJob.profession, type: editJob.type,
-      salary: editJob.salary, phone: editJob.phone,
-      description: editJob.description, urgent: editJob.urgent,
-    }).eq("id", editJob.id);
-    setJobs(prev => prev.map(j => j.id === editJob.id ? editJob : j));
-    setEditJob(null);
   };
 
   const StatCard = ({label, value, icon, color}) => (
@@ -576,7 +564,7 @@ function AdminView({ user, onLogout }) {
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
                   <thead>
                     <tr style={{ background:COLORS.bg }}>
-                      {["Τίτλος","Εταιρεία","Πόλη","Τύπος","Μισθός","Τηλ.","Κατάσταση",""].map(h=>(
+                      {["Τίτλος","Εταιρεία","Πόλη","Τύπος","Μισθός","Κατάσταση",""].map(h=>(
                         <th key={h} style={{ padding:"10px 14px", textAlign:"left", color:COLORS.muted, fontWeight:600 }}>{h}</th>
                       ))}
                     </tr>
@@ -589,20 +577,15 @@ function AdminView({ user, onLogout }) {
                         <td style={{ padding:"10px 14px" }}>{j.city}</td>
                         <td style={{ padding:"10px 14px" }}><Badge type={j.type} /></td>
                         <td style={{ padding:"10px 14px", color:COLORS.success, fontWeight:600 }}>{j.salary}</td>
-                        <td style={{ padding:"10px 14px" }}>{j.phone}</td>
-                      <td style={{ padding:"10px 14px" }}>
+                        <td style={{ padding:"10px 14px" }}>
                           <ActiveBadge active={j.active !== false} />
                         </td>
                         <td style={{ padding:"10px 14px", display:"flex", gap:6 }}>
-                          <button onClick={()=>setEditJob(j)}
-                            style={{ background:"#dbeafe", color:"#1d4ed8", border:"1px solid #93c5fd", borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
-                            ✏️
-                          </button>
                           <button onClick={()=>toggleActive(j.id, j.active !== false)}
                             style={{ background: j.active !== false ? "#fef2f2" : "#dcfce7", color: j.active !== false ? COLORS.danger : "#166534", border:`1px solid ${j.active !== false ? COLORS.danger+"30" : "#86efac"}`, borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
                             {j.active !== false ? "Απενεργοποίηση" : "Ενεργοποίηση"}
                           </button>
-                          <button onClick={()=>deleteJob(j.id)}
+                         <button onClick={()=>deleteJob(j.id, j.title)}
                             style={{ background:"#fef2f2", color:COLORS.danger, border:`1px solid ${COLORS.danger}30`, borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
                             Διαγραφή
                           </button>
@@ -648,34 +631,6 @@ function AdminView({ user, onLogout }) {
           )}
         </>}
       </div>
-
-      {editJob && (
-        <Modal onClose={()=>setEditJob(null)}>
-          <div style={{ fontWeight:800, fontSize:20, color:COLORS.primary, marginBottom:20 }}>✏️ Επεξεργασία Αγγελίας</div>
-          {[["Τίτλος","title"],["Εταιρεία","employer"],["Πόλη","city"],["Περιοχή","area"],["Μισθός","salary"],["Τηλέφωνο","phone"]].map(([label,key]) => (
-            <div key={key} style={{ marginBottom:12 }}>
-              <label style={{ fontSize:12, fontWeight:600, color:COLORS.muted, display:"block", marginBottom:4 }}>{label}</label>
-              <input value={editJob[key]||""} onChange={e=>setEditJob(prev=>({...prev,[key]:e.target.value}))}
-                style={{ width:"100%", padding:"9px 12px", borderRadius:9, border:`1.5px solid ${COLORS.border}`, fontSize:14, boxSizing:"border-box" }} />
-            </div>
-          ))}
-          <div style={{ marginBottom:16 }}>
-            <label style={{ fontSize:12, fontWeight:600, color:COLORS.muted, display:"block", marginBottom:4 }}>Περιγραφή</label>
-            <textarea value={editJob.description||""} onChange={e=>setEditJob(prev=>({...prev,description:e.target.value}))} rows={3}
-              style={{ width:"100%", padding:"9px 12px", borderRadius:9, border:`1.5px solid ${COLORS.border}`, fontSize:14, boxSizing:"border-box", resize:"vertical" }} />
-          </div>
-          <div style={{ display:"flex", gap:10 }}>
-            <button onClick={saveEditJob}
-              style={{ flex:1, background:COLORS.primary, color:"#fff", border:"none", borderRadius:10, padding:"12px 0", fontWeight:700, cursor:"pointer", fontSize:14 }}>
-              💾 Αποθήκευση
-            </button>
-            <button onClick={()=>setEditJob(null)}
-              style={{ flex:1, background:COLORS.bg, color:COLORS.text, border:`1px solid ${COLORS.border}`, borderRadius:10, padding:"12px 0", fontWeight:700, cursor:"pointer", fontSize:14 }}>
-              Άκυρο
-            </button>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 }
