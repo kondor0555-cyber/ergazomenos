@@ -150,7 +150,7 @@ function LandingPage({ onLogin }) {
           <p style={{ textAlign:"center", color:COLORS.muted, marginBottom:48, fontSize:16 }}>Είμαστε εδώ για κάθε ερώτηση</p>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))", gap:32 }}>
             <div>
-              {[["📍","Διεύθυνση","Οδός Παράδειγμα 1, Αθήνα 10000"],["📞","Τηλέφωνο","210 000 0000"],["📧","Email","info@ergan.gr"],["🕐","Ώρες","Δευ-Παρ: 09:00-17:00"]].map(([icon,label,value]) => (
+              {[["📍","Διεύθυνση","Άργος Αργολίδα Δαναού 25"],["📞","Τηλέφωνο","210 000 0000"],["📧","Email","info@ergan.gr"],["🕐","Ώρες","Δευ-Παρ: 09:00-17:00"]].map(([icon,label,value]) => (
                 <div key={label} style={{ display:"flex", gap:16, marginBottom:24, alignItems:"flex-start" }}>
                   <div style={{ fontSize:24, width:40, textAlign:"center" }}>{icon}</div>
                   <div>
@@ -907,7 +907,7 @@ export default function App() {
 
   if (view==="landing") return <LandingPage onLogin={()=>setView("login")} />;
   if (view==="login") return <LoginView onLogin={handleLogin} onSignup={()=>setView("signup")} />;
-  if (view==="signup") return <SignupView onBack={()=>setView("login")} />;
+  if (view==="signup") return <SignupView onBack={()=>setView("landing")} />;
   if (view==="admin") return <AdminView user={user} onLogout={handleLogout} />;
   if (view==="post") return <PostJobView user={user} onBack={()=>setView("jobs")} />;
   return <JobsView user={user} onPost={()=>setView("post")} onLogout={handleLogout} />;
