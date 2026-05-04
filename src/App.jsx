@@ -485,7 +485,8 @@ function AdminView({ user, onLogout }) {
     load();
   }, []);
 
-  const deleteJob = async (id) => {
+  const deleteJob = async (id, title) => {
+    if (!window.confirm(`Θέλεις σίγουρα να διαγράψεις την αγγελία "${title}";`)) return;
     await supabase.from("jobs").delete().eq("id", id);
     setJobs(prev => prev.filter(j => j.id !== id));
   };
@@ -584,7 +585,7 @@ function AdminView({ user, onLogout }) {
                             style={{ background: j.active !== false ? "#fef2f2" : "#dcfce7", color: j.active !== false ? COLORS.danger : "#166534", border:`1px solid ${j.active !== false ? COLORS.danger+"30" : "#86efac"}`, borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
                             {j.active !== false ? "Απενεργοποίηση" : "Ενεργοποίηση"}
                           </button>
-                          <button onClick={()=>deleteJob(j.id)}
+                         <button onClick={()=>deleteJob(j.id, j.title)}
                             style={{ background:"#fef2f2", color:COLORS.danger, border:`1px solid ${COLORS.danger}30`, borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
                             Διαγραφή
                           </button>
