@@ -150,7 +150,7 @@ function LandingPage({ onLogin }) {
           <p style={{ textAlign:"center", color:COLORS.muted, marginBottom:48, fontSize:16 }}>Είμαστε εδώ για κάθε ερώτηση</p>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))", gap:32 }}>
             <div>
-              {[["📍","Διεύθυνση","Άργος Αργολίδα Δαναού 25"],["📞","Τηλέφωνο","210 000 0000"],["📧","Email","info@ergan.gr"],["🕐","Ώρες","Δευ-Παρ: 09:00-17:00"]].map(([icon,label,value]) => (
+              {[["📍","Διεύθυνση","Οδός Παράδειγμα 1, Αθήνα 10000"],["📞","Τηλέφωνο","210 000 0000"],["📧","Email","info@ergan.gr"],["🕐","Ώρες","Δευ-Παρ: 09:00-17:00"]].map(([icon,label,value]) => (
                 <div key={label} style={{ display:"flex", gap:16, marginBottom:24, alignItems:"flex-start" }}>
                   <div style={{ fontSize:24, width:40, textAlign:"center" }}>{icon}</div>
                   <div>
@@ -255,7 +255,7 @@ function JobCard({ job, onCall, onDetail }) {
 }
 
 // ─── LOGIN ────────────────────────────────────────────────────────
-function LoginView({ onLogin, onSignup }) {
+function LoginView({ onLogin, onSignup, onBack }) {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [err, setErr] = useState("");
@@ -266,7 +266,6 @@ function LoginView({ onLogin, onSignup }) {
     setErr(""); setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
     if (error) { setErr("Λάθος email ή κωδικός."); setLoading(false); return; }
-    // fetch profile
     const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single();
     const role = email === ADMIN_EMAIL ? "admin" : (profile?.role || "worker");
     onLogin({ ...data.user, ...profile, role });
@@ -276,9 +275,12 @@ function LoginView({ onLogin, onSignup }) {
   return (
     <div style={{ minHeight:"100vh", background:`linear-gradient(135deg, ${COLORS.primary} 0%, #2563a8 100%)`, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
       <div style={{ background:COLORS.card, borderRadius:22, padding:"36px 32px", maxWidth:400, width:"100%", boxShadow:"0 24px 60px rgba(0,0,0,0.25)" }}>
+        <button onClick={onBack} style={{ background:"none", border:"none", fontSize:13, cursor:"pointer", color:COLORS.muted, marginBottom:12, display:"flex", alignItems:"center", gap:4 }}>
+          ← Αρχική
+        </button>
         <div style={{ textAlign:"center", marginBottom:28 }}>
           <div style={{ fontSize:44, marginBottom:8 }}>💼</div>
-          <div style={{ fontSize:26, fontWeight:800, color:COLORS.primary }}>Εργαζόμενος</div>
+          <div style={{ fontSize:26, fontWeight:800, color:COLORS.primary }}>Ergan</div>
           <div style={{ fontSize:13, color:COLORS.muted, marginTop:4 }}>Η πλατφόρμα εργασίας για όλους</div>
         </div>
         {msg && <div style={{ background:"#f0fdf4", color:COLORS.success, borderRadius:8, padding:"10px 12px", fontSize:13, marginBottom:14 }}>{msg}</div>}
@@ -906,7 +908,7 @@ export default function App() {
   );
 
   if (view==="landing") return <LandingPage onLogin={()=>setView("login")} />;
-  if (view==="login") return <LoginView onLogin={handleLogin} onSignup={()=>setView("signup")} />;
+  if (view==="login") return <LoginView onLogin={handleLogin} onSignup={()=>setView("signup")} onBack={()=>setView("landing")} />;
   if (view==="signup") return <SignupView onBack={()=>setView("landing")} />;
   if (view==="admin") return <AdminView user={user} onLogout={handleLogout} />;
   if (view==="post") return <PostJobView user={user} onBack={()=>setView("jobs")} />;
