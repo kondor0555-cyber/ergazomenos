@@ -757,35 +757,34 @@ function AdminView({ user, onLogout }) {
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
                   <thead>
                     <tr style={{ background:COLORS.bg }}>
-                      {["Τίτλος","Εταιρεία","Πόλη","Τύπος","Μισθός","Τηλ.","Κατάσταση",""].map(h=>(
-                        <th key={h} style={{ padding:"10px 14px", textAlign:"left", color:COLORS.muted, fontWeight:600 }}>{h}</th>
+                      {["Τίτλος","Εταιρεία","Πόλη","Τύπος","Μισθός","Κατάσταση",""].map(h=>(
+                        <th key={h} style={{ padding:"8px 10px", textAlign:"left", color:COLORS.muted, fontWeight:600, whiteSpace:"nowrap" }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {jobs.map((j,i) => (
                       <tr key={j.id} style={{ borderTop:`1px solid ${COLORS.border}`, background:i%2===0?"#fff":COLORS.bg }}>
-                        <td style={{ padding:"10px 14px", fontWeight:600 }}>{j.logo} {j.title}</td>
-                        <td style={{ padding:"10px 14px", color:COLORS.muted }}>{j.employer}</td>
-                        <td style={{ padding:"10px 14px" }}>{j.city}</td>
-                        <td style={{ padding:"10px 14px" }}><Badge type={j.type} /></td>
-                        <td style={{ padding:"10px 14px", color:COLORS.success, fontWeight:600 }}>{j.salary}</td>
-                        <td style={{ padding:"10px 14px" }}>{j.phone}</td>
-                      <td style={{ padding:"10px 14px" }}>
+                        <td style={{ padding:"8px 10px", fontWeight:600, whiteSpace:"nowrap" }}>{j.logo} {j.title}</td>
+                        <td style={{ padding:"8px 10px", color:COLORS.muted, whiteSpace:"nowrap" }}>{j.employer}</td>
+                        <td style={{ padding:"8px 10px", whiteSpace:"nowrap" }}>{j.city}</td>
+                        <td style={{ padding:"8px 10px" }}><Badge type={j.type} /></td>
+                        <td style={{ padding:"8px 10px", color:COLORS.success, fontWeight:600, whiteSpace:"nowrap" }}>{j.salary}</td>
+                        <td style={{ padding:"8px 10px" }}>
                           <ActiveBadge active={j.active !== false} />
                         </td>
-                        <td style={{ padding:"10px 14px", display:"flex", gap:6 }}>
+                        <td style={{ padding:"8px 10px", display:"flex", gap:6 }}>
                           <button onClick={()=>setEditJob(j)}
                             style={{ background:"#dbeafe", color:"#1d4ed8", border:"1px solid #93c5fd", borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
                             ✏️
                           </button>
                           <button onClick={()=>toggleActive(j.id, j.active !== false)}
-                            style={{ background: j.active !== false ? "#fef2f2" : "#dcfce7", color: j.active !== false ? COLORS.danger : "#166534", border:`1px solid ${j.active !== false ? COLORS.danger+"30" : "#86efac"}`, borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
-                            {j.active !== false ? "Απενεργοποίηση" : "Ενεργοποίηση"}
+                            style={{ background: j.active !== false ? "#fef2f2" : "#dcfce7", color: j.active !== false ? COLORS.danger : "#166534", border:`1px solid ${j.active !== false ? COLORS.danger+"30" : "#86efac"}`, borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600, whiteSpace:"nowrap" }}>
+                            {j.active !== false ? "Απενεργ." : "Ενεργοπ."}
                           </button>
-                          <button onClick={()=>deleteJob(j.id)}
+                          <button onClick={()=>deleteJob(j.id, j.title)}
                             style={{ background:"#fef2f2", color:COLORS.danger, border:`1px solid ${COLORS.danger}30`, borderRadius:7, padding:"5px 10px", fontSize:12, cursor:"pointer", fontWeight:600 }}>
-                            Διαγραφή
+                            🗑️
                           </button>
                         </td>
                       </tr>
