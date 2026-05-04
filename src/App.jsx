@@ -563,7 +563,7 @@ function AdminView({ user, onLogout }) {
                 <table style={{ width:"100%", borderCollapse:"collapse", fontSize:13 }}>
                   <thead>
                     <tr style={{ background:COLORS.bg }}>
-                      {["Τίτλος","Εταιρεία","Πόλη","Τύπος","Μισθός","Τηλ.","Κατάσταση",""].map(h=>(
+                      {["Τίτλος","Εταιρεία","Πόλη","Τύπος","Μισθός","Κατάσταση",""].map(h=>(
                         <th key={h} style={{ padding:"10px 14px", textAlign:"left", color:COLORS.muted, fontWeight:600 }}>{h}</th>
                       ))}
                     </tr>
@@ -576,8 +576,7 @@ function AdminView({ user, onLogout }) {
                         <td style={{ padding:"10px 14px" }}>{j.city}</td>
                         <td style={{ padding:"10px 14px" }}><Badge type={j.type} /></td>
                         <td style={{ padding:"10px 14px", color:COLORS.success, fontWeight:600 }}>{j.salary}</td>
-                        <td style={{ padding:"10px 14px" }}>{j.phone}</td>
-                      <td style={{ padding:"10px 14px" }}>
+                        <td style={{ padding:"10px 14px" }}>
                           <ActiveBadge active={j.active !== false} />
                         </td>
                         <td style={{ padding:"10px 14px", display:"flex", gap:6 }}>
